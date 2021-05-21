@@ -1,7 +1,8 @@
+/// Copyright 2021 RISE Research Institute of Sweden. All rights reserved.
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-#include <chrono>
+#include <chrono>  // NOLINT
 #include <string>
 #include <vector>
 

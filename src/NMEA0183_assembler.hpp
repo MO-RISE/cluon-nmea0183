@@ -1,8 +1,12 @@
+/// Copyright 2021 RISE Research Institute of Sweden. All rights reserved.
+#ifndef SRC_NMEA0183_ASSEMBLER_HPP_
+#define SRC_NMEA0183_ASSEMBLER_HPP_
 
-#include <chrono>
+#include <chrono>  // NOLINT
 #include <functional>
 #include <sstream>
 #include <string>
+#include <utility>
 
 class NMEA0183SentenceAssembler {
   std::string remainder_;
@@ -15,7 +19,7 @@ class NMEA0183SentenceAssembler {
       std::function<void(const std::string &,
                          const std::chrono::system_clock::time_point &)>
           delegate)
-      : delegate_(delegate){};
+      : delegate_(delegate) {}
 
   void operator()(std::string &&data,
                   std::chrono::system_clock::time_point &&tp) {
@@ -32,7 +36,7 @@ class NMEA0183SentenceAssembler {
         remainder_ = line;
         break;
       }
-      if (line.at(0) == '$' or line.at(0) == '!') {
+      if (line.at(0) == '$' || line.at(0) == '!') {
         // All valid nmea messages should start with either $ or !
         // Trim for any trailing whitespace
         line.erase(line.find_last_not_of(" \n\r\t") + 1);
@@ -42,3 +46,5 @@ class NMEA0183SentenceAssembler {
     }
   }
 };
+
+#endif  // SRC_NMEA0183_ASSEMBLER_HPP_"

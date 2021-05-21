@@ -1,3 +1,4 @@
+/// Copyright 2021 RISE Research Institute of Sweden. All rights reserved.
 #include <iostream>
 
 #include "NMEA0183_assembler.hpp"
@@ -38,7 +39,7 @@ auto main(int argc, char **argv) -> int {
       [&VERBOSE, &logger, &od4](
           const std::string &sentence,
           const std::chrono::system_clock::time_point &timestamp) {
-        // TODO: Publish message
+        // TODO(freol35241): Publish message
 
         // Log to disk
         std::stringstream message;
@@ -70,7 +71,7 @@ auto main(int argc, char **argv) -> int {
   }
 
   // Just sleep as this microservice is data driven.
-  using namespace std::literals::chrono_literals;
+  using namespace std::literals::chrono_literals;  // NOLINT
   while (od4.isRunning()) {
     std::this_thread::sleep_for(1s);
   }
