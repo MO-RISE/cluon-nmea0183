@@ -24,12 +24,9 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-  NAME cxxopts
-  GITHUB_REPOSITORY jarro2783/cxxopts
-  VERSION 2.2.0
-  OPTIONS
-    "CXXOPTS_BUILD_EXAMPLES OFF"
-    "CXXOPTS_BUILD_TESTS OFF"
+  NAME CLI11
+  GITHUB_REPOSITORY CLIUtils/CLI11
+  VERSION 1.9.1  
 )
 
 CPMAddPackage("gh:gabime/spdlog@1.8.2")
@@ -50,7 +47,7 @@ add_custom_target(generate_cluon_complete_hpp DEPENDS ${CMAKE_BINARY_DIR}/cluon-
 add_executable(${PROJECT_NAME} src/main.cpp)
 add_dependencies(${PROJECT_NAME} generate_cluon_complete_hpp)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src SYSTEM ${CMAKE_BINARY_DIR})
-target_link_libraries(${PROJECT_NAME} Threads::Threads cxxopts spdlog::spdlog_header_only)
+target_link_libraries(${PROJECT_NAME} Threads::Threads CLI11 spdlog::spdlog_header_only)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 # Enable unit testing.
