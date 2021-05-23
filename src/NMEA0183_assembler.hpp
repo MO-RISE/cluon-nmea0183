@@ -32,8 +32,8 @@ class NMEA0183SentenceAssembler {
     std::string line;
     while (std::getline(buffer, line, '\n')) {
       if (buffer.eof()) {
-        // If we run out of buffer, lets keep that last partial and bail
-        remainder_ = line;
+        // If we run out of buffer, we dont have a full line and bail
+        // accordingly
         break;
       }
       if (line.at(0) == '$' || line.at(0) == '!') {
@@ -44,6 +44,8 @@ class NMEA0183SentenceAssembler {
         delegate_(line, time_stamp);
       }
     }
+    // Make sure we save any remaining characters for next incoming
+    remainder_ = line;
   }
 };
 
