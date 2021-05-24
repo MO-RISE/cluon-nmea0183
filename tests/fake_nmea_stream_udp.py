@@ -19,7 +19,7 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     for sentence in NMEA0183_SENTENCES:
         s.sendto(sentence.encode(),(HOST, args.port))
-        time.sleep(0.01)
+        time.sleep(0.001)
 
 
 if __name__ == "__main__":
