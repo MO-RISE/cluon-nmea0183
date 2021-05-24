@@ -21,7 +21,7 @@ class NMEA0183SentenceAssembler {
           delegate)
       : delegate_(delegate) {}
 
-  void operator()(std::string &&data,
+  void operator()(const std::string &data,
                   std::chrono::system_clock::time_point &&tp) {
     // Get total buffered data
     std::stringstream buffer{remainder_ + data};

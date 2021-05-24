@@ -18,7 +18,7 @@ TEST_CASE("Test NMEA0183SentenceAssembler with empty payload.") {
                 const std::chrono::system_clock::time_point& timestamp) {
         output = line;
       }};
-  a(std::move(DATA), std::chrono::system_clock::time_point());
+  a(DATA, std::chrono::system_clock::time_point());
 
   REQUIRE(output.empty());
 }
@@ -36,7 +36,7 @@ TEST_CASE("Test NMEA0183SentenceAssembler with payload of wrong format") {
         output = line;
         call_count++;
       }};
-  a(std::move(DATA), std::chrono::system_clock::time_point());
+  a(DATA, std::chrono::system_clock::time_point());
 
   REQUIRE(output.empty());
   REQUIRE_EQ(call_count, 0);
@@ -57,7 +57,7 @@ TEST_CASE("Test NMEA0183SentenceAssembler with single correct sentence") {
         output = line;
         call_count++;
       }};
-  a(std::move(DATA), std::chrono::system_clock::time_point());
+  a(DATA, std::chrono::system_clock::time_point());
 
   REQUIRE_EQ(output, DATA.substr(0, DATA.size() - 2));
   REQUIRE_EQ(call_count, 1);
@@ -84,9 +84,9 @@ TEST_CASE("Test NMEA0183SentenceAssembler with multiple sentences") {
         output.push_back(line);
         call_count++;
       }};
-  a(std::move(DATA1), std::chrono::system_clock::time_point());
-  a(std::move(DATA2), std::chrono::system_clock::time_point());
-  a(std::move(DATA3), std::chrono::system_clock::time_point());
+  a(DATA1, std::chrono::system_clock::time_point());
+  a(DATA2, std::chrono::system_clock::time_point());
+  a(DATA3, std::chrono::system_clock::time_point());
 
   REQUIRE_EQ(call_count, 3);
   REQUIRE_EQ(output[0], DATA1.substr(0, DATA1.size() - 2));
@@ -112,7 +112,7 @@ TEST_CASE("Test NMEA0183SentenceAssembler with split sentence") {
         output = line;
         call_count++;
       }};
-  a(std::move(input), std::chrono::system_clock::time_point());
+  a(input, std::chrono::system_clock::time_point());
 
   REQUIRE_EQ(output, DATA.substr(0, DATA.size() - 2));
   REQUIRE_EQ(call_count, 2);
