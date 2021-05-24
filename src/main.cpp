@@ -26,13 +26,13 @@ auto main(int argc, char **argv) -> int {
   //                       messages.
 
   // A sink that rotates at midnight
-  auto logger =
+  auto sink =
       spdlog::daily_logger_mt("daily_logger", "NMEA0183/sentences.txt", 0, 0);
-  logger->set_pattern("%v");
+  sink->set_pattern("%v");
 
   // Wrap everything in a sentence handler lambda
   auto sentence_handler =
-      [&verbose, &logger](
+      [&verbose, &sink](
           const std::string &sentence,
           const std::chrono::system_clock::time_point &timestamp) {
         // TODO(freol35241): Publish message on OpenDaVINCI session
@@ -44,7 +44,8 @@ auto main(int argc, char **argv) -> int {
                 .count();
         std::stringstream message;
         message << ms_since_epoch << " " << sentence;
-        logger->info(message.str());
+        sink->info(message.str());
+        sink->flush();
 
         if (verbose) {
           std::cout << message.str() << std::endl;
