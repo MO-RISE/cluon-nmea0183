@@ -39,7 +39,7 @@ auto main(int argc, char **argv) -> int {
 
         // Log to disk
         auto ms_since_epoch =
-            std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::duration_cast<std::chrono::microseconds>(
                 timestamp.time_since_epoch())
                 .count();
         std::stringstream message;
