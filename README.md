@@ -1,5 +1,7 @@
 # cluon-nmea0183
 
+Copyright 2021 RISE Research Institute of Sweden. All rights reserved. For details, please contact Fredrik Olsson (fredrik.x.olsson@ri.se)
+
 A cluon-based microservice for eavesdropping on a NMEA0183 stream (UDP). This software does not perform any parsing of the NMEA sentences, merely assembles them to full sentences and:
 * Publishes them on the OD4 session
 * Logs them to disk (daily rotated files)

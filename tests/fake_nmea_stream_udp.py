@@ -1,3 +1,4 @@
+# Copyright 2021 RISE Research Institute of Sweden. All rights reserved.
 import time
 import socket
 import argparse
