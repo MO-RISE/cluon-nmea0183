@@ -61,3 +61,25 @@ jobs:
           cd build
           ctest -C Debug -T test --output-on-failure --
 
+  testing-windows:
+    runs-on: windows-latest
+    needs: [testing-linux]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: "**/cpm_modules"
+          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+      - name: Configure and build on win32 (!)
+        run: |
+          cmake tests -Bbuild
+          cmake --build build --config Release
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest -C Release -T test --output-on-failure --verbose
+
