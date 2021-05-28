@@ -17,18 +17,7 @@ include(${CPM_DOWNLOAD_LOCATION})
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-CPMAddPackage(
-  NAME doctest
-  GITHUB_REPOSITORY onqtam/doctest
-  GIT_TAG 2.4.0
-)
-
-CPMAddPackage(
-  NAME CLI11
-  GITHUB_REPOSITORY CLIUtils/CLI11
-  VERSION 1.9.1  
-)
-
+CPMAddPackage("gh:CLIUtils/CLI11@1.9.1")
 CPMAddPackage("gh:gabime/spdlog@1.8.2")
 
 CPMAddPackage(
@@ -51,7 +40,9 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} Threads::Threads cluon-static CLI11 spdlog::spdlog_header_only)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
-# Enable unit testing.
+# Tests
+CPMAddPackage("gh:onqtam/doctest#2.4.0")
+
 enable_testing()
 add_executable(${PROJECT_NAME}-tester ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_nmea_0183_assembler.cpp)
 target_include_directories(${PROJECT_NAME}-tester PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
