@@ -73,7 +73,7 @@ jobs:
           path: "**/cpm_modules"
           key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
 
-      - name: Configure and build on win32 (!)
+      - name: Configure and build
         run: |
           cmake tests -Bbuild
           cmake --build build --config Release
