@@ -7,24 +7,11 @@
 #include "cluon/UDPReceiver.hpp"
 #include "spdlog/sinks/daily_file_sink.h"
 
-auto main(int argc, char **argv) -> int {
-  CLI::App app{"NMEA0183 UDP Eavesdropper"};
-
-  // uint16_t cid;
-  // app.add_option("-c,--cid", cid, "OpenDaVINCI session id")->required();
-  std::string address;
-  app.add_option("-a,--address", address, "IP address of stream")->required();
-  uint16_t port;
-  app.add_option("-p,--port", port, "Port number to connect to")->required();
-  bool verbose = false;
-  app.add_flag("--verbose", verbose, "Print to cout");
-
-  CLI11_PARSE(app, argc, argv);
-
-  // // Setup a cluon instance
-  // cluon::OD4Session od4{cid,
-  //                       [](auto) {}};  // Empty callback for incoming
-  //                       messages.
+auto run_as_gatherer(uint16_t cid, uint16_t id, std::string address,
+                     uint16_t port, bool verbose) {
+  // Setup a cluon instance
+  cluon::OD4Session od4{cid,
+                        [](auto) {}};  // Empty callback for incoming messages.
 
   // A sink that rotates at midnight
   auto sink =
@@ -62,13 +49,43 @@ auto main(int argc, char **argv) -> int {
       address, port,
       [&assembler](std::string &&d, std::string && /*from*/,
                    std::chrono::system_clock::time_point &&tp) noexcept {
-        assembler(std::move(d), std::move(tp));
+        assembler(d, std::move(tp));
       }};
 
   using namespace std::literals::chrono_literals;  // NOLINT
   while (connection.isRunning()) {
     std::this_thread::sleep_for(1s);
   }
+}
+
+auto main(int argc, char **argv) -> int {
+  CLI::App app{"NMEA0183 UDP Eavesdropper"};
+
+  // General options for this service
+  uint16_t cid = 111;
+  app.add_option("-c,--cid", cid, "OpenDaVINCI session id");
+  uint16_t id = 1;
+  app.add_option("-i,--id", id, "Identification id of this microservice");
+  bool verbose = false;
+  app.add_flag("--verbose", verbose, "Print to cout");
+
+  app.require_subcommand(1);
+
+  // Gather subcommand
+  auto gather = app.add_subcommand(
+      "gather",
+      "Run in data gathering mode, i.e connect to a UDP stream, listen for "
+      "incoming NMEA0183 messages and publish them on an OD4 session");
+  std::string address;
+  gather->add_option("-a,--address", address, "IP address of stream")
+      ->required();
+  uint16_t port;
+  gather->add_option("-p,--port", port, "Port number to connect to")
+      ->required();
+  gather->callback(
+      [&]() { return run_as_gatherer(cid, id, address, port, verbose); });
+
+  CLI11_PARSE(app, argc, argv);
 
   return 0;
 }
