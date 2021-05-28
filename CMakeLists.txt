@@ -31,23 +31,24 @@ CPMAddPackage(
 
 CPMAddPackage("gh:gabime/spdlog@1.8.2")
 
-# Extract cluon-msc from cluon-complete.hpp.
-set(CLUON_COMPLETE cluon-complete-v0.0.140.hpp)
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluon-msc
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/external/${CLUON_COMPLETE} ${CMAKE_BINARY_DIR}/cluon-complete.hpp
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/cluon-complete.hpp ${CMAKE_BINARY_DIR}/cluon-complete.cpp
-    COMMAND ${CMAKE_CXX_COMPILER} -o ${CMAKE_BINARY_DIR}/cluon-msc ${CMAKE_BINARY_DIR}/cluon-complete.cpp -std=c++14 -pthread -D HAVE_CLUON_MSC
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/external/${CLUON_COMPLETE})
-
-# Add custom traget to make sure we can specify dependency
-add_custom_target(generate_cluon_complete_hpp DEPENDS ${CMAKE_BINARY_DIR}/cluon-msc)
+CPMAddPackage(
+  NAME cluon
+  GITHUB_REPOSITORY chrberger/libcluon
+  VERSION 0.0.140
+  SOURCE_SUBDIR libcluon
+  EXCLUDE_FROM_ALL YES
+  PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/external/libcluon_CMakeLists_disable_tests.patch
+)
 
 # Create executable
 add_executable(${PROJECT_NAME} src/main.cpp)
-add_dependencies(${PROJECT_NAME} generate_cluon_complete_hpp)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src SYSTEM ${CMAKE_BINARY_DIR})
-target_link_libraries(${PROJECT_NAME} Threads::Threads CLI11 spdlog::spdlog_header_only)
+target_include_directories(${PROJECT_NAME} 
+  PRIVATE 
+  ${CMAKE_CURRENT_SOURCE_DIR}/src 
+  ${cluon_SOURCE_DIR}/libcluon/include
+  ${CMAKE_BINARY_DIR}/include # Compiled message specifications!
+)
+target_link_libraries(${PROJECT_NAME} Threads::Threads cluon-static CLI11 spdlog::spdlog_header_only)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 # Enable unit testing.

@@ -3,7 +3,8 @@
 
 #include "CLI/CLI.hpp"
 #include "NMEA0183_assembler.hpp"
-#include "cluon-complete.hpp"
+#include "cluon/OD4Session.hpp"
+#include "cluon/UDPReceiver.hpp"
 #include "spdlog/sinks/daily_file_sink.h"
 
 auto main(int argc, char **argv) -> int {
