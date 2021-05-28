@@ -75,7 +75,7 @@ jobs:
 
       - name: Configure and build
         run: |
-          cmake tests -Bbuild
+          cmake -Bbuild
           cmake --build build --config Release
 
       - name: Run tests
