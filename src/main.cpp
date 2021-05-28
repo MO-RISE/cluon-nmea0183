@@ -5,6 +5,7 @@
 #include "NMEA0183_assembler.hpp"
 #include "cluon/OD4Session.hpp"
 #include "cluon/UDPReceiver.hpp"
+#include "opendlv-standard-message-set.hpp"
 #include "spdlog/sinks/daily_file_sink.h"
 
 auto run_as_gatherer(uint16_t cid, uint16_t id, std::string address,

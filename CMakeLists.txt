@@ -29,16 +29,38 @@ CPMAddPackage(
   PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/external/libcluon_CMakeLists_disable_tests.patch
 )
 
+CPMAddPackage(
+  NAME opendlv-standard-message-set
+  GITHUB_REPOSITORY chalmers-revere/opendlv.standard-message-set
+  VERSION 0.9.9
+  DOWNLOAD_ONLY YES
+)
+
+# Compile message specifications
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/opendlv-standard-message-set.hpp
+  DEPENDS cluon
+  COMMAND cluon-msc --cpp --out=${CMAKE_CURRENT_BINARY_DIR}/opendlv-standard-message-set.hpp ${opendlv-standard-message-set_SOURCE_DIR}/opendlv.odvd
+)
+add_custom_target(
+  generate_opendlv_standard_message_set_hpp 
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/opendlv-standard-message-set.hpp
+)
+
 # Create executable
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_include_directories(${PROJECT_NAME} 
   PRIVATE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src 
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+  # cluon specific inludes
   ${cluon_SOURCE_DIR}/libcluon/include
   ${CMAKE_BINARY_DIR}/include # Compiled message specifications!
+  # compiled message specifications for this project
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 target_link_libraries(${PROJECT_NAME} Threads::Threads cluon-static CLI11 spdlog::spdlog_header_only)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
+add_dependencies(${PROJECT_NAME} generate_opendlv_standard_message_set_hpp)
 
 # Tests
 CPMAddPackage("gh:onqtam/doctest#2.4.0")
