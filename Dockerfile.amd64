@@ -1,0 +1,26 @@
+FROM alpine:3.13 as builder
+LABEL maintainer "fredrik.x.olsson@ri.se"
+RUN apk update && \
+    apk --no-cache add \
+    cmake \
+    g++ \
+    make \
+    upx \
+    linux-headers  \
+    git
+ADD . /opt/sources
+WORKDIR /opt/sources
+RUN cmake -Bbuild -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/tmp/cluon-nmea0183-dest && \
+    cmake --build build --target install && upx -9 /tmp/cluon-nmea0183-dest/bin/cluon-nmea0183  && \
+    cd build && ctest -T test --output-on-failure
+
+# Production image
+FROM alpine:3.13
+LABEL maintainer "fredrik.x.olsson@ri.se"
+
+RUN apk update && apk add --no-cache \ 
+    libstdc++
+
+WORKDIR /usr/bin
+COPY --from=builder /tmp/cluon-nmea0183-dest/bin/cluon-nmea0183 .
+ENTRYPOINT ["/usr/bin/cluon-nmea0183"]

@@ -26,6 +26,7 @@ CPMAddPackage(
   VERSION 0.0.140
   SOURCE_SUBDIR libcluon
   EXCLUDE_FROM_ALL YES
+  GIT_SHALLOW YES
   PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/external/libcluon_CMakeLists_disable_tests.patch
 )
 
@@ -33,6 +34,7 @@ CPMAddPackage(
   NAME opendlv-standard-message-set
   GITHUB_REPOSITORY chalmers-revere/opendlv.standard-message-set
   VERSION 0.9.9
+  GIT_SHALLOW YES
   DOWNLOAD_ONLY YES
 )
 
