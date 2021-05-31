@@ -6,7 +6,7 @@ project(cluon-nmea0183 LANGUAGES CXX)
 
 # Fetch CPM
 set(CPM_DOWNLOAD_VERSION 0.32.0) 
-set(CPM_DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
+set(CPM_DOWNLOAD_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
 if(NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
   message(STATUS "Downloading CPM.cmake v${CPM_DOWNLOAD_VERSION}")
   file(DOWNLOAD https://github.com/cpm-cmake/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake ${CPM_DOWNLOAD_LOCATION})
@@ -38,13 +38,15 @@ CPMAddPackage(
 
 # Compile message specifications
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/opendlv-standard-message-set.hpp
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/message_specifications
   DEPENDS cluon
-  COMMAND cluon-msc --cpp --out=${CMAKE_CURRENT_BINARY_DIR}/opendlv-standard-message-set.hpp ${opendlv-standard-message-set_SOURCE_DIR}/opendlv.odvd
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/message_specifications
+  COMMAND cluon-msc --cpp --out=${CMAKE_CURRENT_BINARY_DIR}/message_specifications/opendlv-standard-message-set.hpp ${opendlv-standard-message-set_SOURCE_DIR}/opendlv.odvd
+  COMMAND cluon-msc --cpp --out=${CMAKE_CURRENT_BINARY_DIR}/message_specifications/risemo-message-set.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/risemo-message-set.odvd
 )
 add_custom_target(
-  generate_opendlv_standard_message_set_hpp 
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/opendlv-standard-message-set.hpp
+  generate_message_specifications
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/message_specifications
 )
 
 # Create executable
@@ -54,13 +56,14 @@ target_include_directories(${PROJECT_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   # cluon specific inludes
   ${cluon_SOURCE_DIR}/libcluon/include
-  ${CMAKE_BINARY_DIR}/include # Compiled message specifications!
+  ${cluon_SOURCE_DIR}/libcluon/thirdparty
+  ${CMAKE_CURRENT_BINARY_DIR}/include # libcluon "built-in" message specifications
   # compiled message specifications for this project
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/message_specifications
 )
 target_link_libraries(${PROJECT_NAME} Threads::Threads cluon-static CLI11 spdlog::spdlog_header_only)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
-add_dependencies(${PROJECT_NAME} generate_opendlv_standard_message_set_hpp)
+add_dependencies(${PROJECT_NAME} generate_message_specifications)
 
 # Tests
 CPMAddPackage("gh:onqtam/doctest#2.4.0")

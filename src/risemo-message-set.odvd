@@ -1,0 +1,4 @@
+
+message risemo.raw.NMEA0183 [id = 1201] {
+  string sentence [id = 1];
+}
