@@ -1,5 +1,6 @@
 /// Copyright 2021 RISE Research Institute of Sweden. All rights reserved.
 #include <iostream>
+#include <optional>
 
 #include "CLI/CLI.hpp"
 #include "NMEA0183_assembler.hpp"
