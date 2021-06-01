@@ -1,4 +1,5 @@
 /// Copyright 2021 RISE Research Institute of Sweden. All rights reserved.
+#include <filesystem>
 #include <iostream>
 #include <optional>
 
@@ -18,6 +19,10 @@ auto main(int argc, char **argv) -> int {
   app.add_option("-c,--cid", cid, "OpenDaVINCI session id");
   uint16_t id = 1;
   app.add_option("-i,--id", id, "Identification id of this microservice");
+  std::filesystem::path dump_path{"NMEA0183/sentences.txt"};
+  app.add_option("-p,--path", dump_path,
+                 "Absolute or relative path to a non-existing file where the "
+                 "recorded NMEA0183 sentences will be dumped to disk");
   bool verbose = false;
   app.add_flag("--verbose", verbose, "Print to cout");
 
@@ -28,7 +33,7 @@ auto main(int argc, char **argv) -> int {
       "gather",
       "Run in data gathering mode, i.e connect to a UDP stream, listen for "
       "incoming NMEA0183 messages and publish them on an OD4 session. "
-      "Optionally, it is possible to dump the incoming NMEA0183 message "
+      "Optionally, it is possible to dump the incoming NMEA0183 sentences "
       "directly to disk");
   std::string address;
   gather->add_option("-a,--address", address, "IP address of stream")
@@ -46,8 +51,7 @@ auto main(int argc, char **argv) -> int {
     std::optional<std::shared_ptr<spdlog::logger>> sink = std::nullopt;
 
     if (standalone) {
-      sink = spdlog::daily_logger_mt("daily_logger", "NMEA0183/sentences.txt",
-                                     0, 0);
+      sink = spdlog::daily_logger_mt("daily_logger", dump_path.string(), 0, 0);
       (*sink)->set_pattern("%v");
     }
 
@@ -104,7 +108,7 @@ auto main(int argc, char **argv) -> int {
   log->callback([&]() {
     // A sink that rotates at midnight
     auto sink =
-        spdlog::daily_logger_mt("daily_logger", "NMEA0183/sentences.txt", 0, 0);
+        spdlog::daily_logger_mt("daily_logger", dump_path.string(), 0, 0);
     sink->set_pattern("%v");
 
     // Setup a cluon instance
