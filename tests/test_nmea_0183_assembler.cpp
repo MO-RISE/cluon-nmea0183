@@ -63,6 +63,31 @@ TEST_CASE("Test NMEA0183SentenceAssembler with single correct sentence") {
   REQUIRE_EQ(call_count, 1);
 }
 
+TEST_CASE(
+    "Test NMEA0183SentenceAssembler with single correct sentence inbetween "
+    "scramble") {
+  size_t call_count{0};
+  std::string output;
+
+  std::string DATA{
+      "$GNGGA,122144.75,5741.1528,N,01153.1746,E,4,-1,,3.29,M,35.78,M,,*"
+      "4D\r\n"};
+
+  std::string scramble{"dadnsldasdc\n"};
+
+  NMEA0183SentenceAssembler a{
+      [&output, &call_count](
+          const std::string& line,
+          const std::chrono::system_clock::time_point& timestamp) {
+        output = line;
+        call_count++;
+      }};
+  a(scramble + DATA + scramble, std::chrono::system_clock::time_point());
+
+  REQUIRE_EQ(output, DATA.substr(0, DATA.size() - 2));
+  REQUIRE_EQ(call_count, 1);
+}
+
 TEST_CASE("Test NMEA0183SentenceAssembler with multiple sentences") {
   size_t call_count{0};
   std::vector<std::string> output;
