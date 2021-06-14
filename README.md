@@ -74,3 +74,21 @@ ctest -C Debug -T test --output-on-failure --
 
 A simple integration test can also be done by running the compiled commandline tool (cluon-nmea0183) in conjunction with the provided python script `fake_nmea_0183_stream_udp.py` in the `tests` folder.
 
+### Development setup
+This repo contains some configuration files (in the `.vscode`-folder) for getting started easy on the following setup:
+* Ubuntu 20.04 (WSL2 is fine)
+* GCC 9
+* python 3
+* VSCode as IDE, using the following extensions:
+  - C/C++ (ms-vscode.cpptools)
+  - C/C++ Extension Pack (ms-vscode.cpptools-extension-pack)
+  - CMake Tools (ms-vscode.cmake-tools)
+  - Python (ms-python.python)
+
+Do the following steps to get started:
+* Clone repo
+* Create a python virtual environment (`python3 -m venv venv`) in the root of the repo.
+* Open vscode in the repo root (`code .`)
+
+The provided configuration is very lightweight and should be easily adaptable to other enviroments/setups.
+
