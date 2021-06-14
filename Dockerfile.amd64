@@ -1,5 +1,4 @@
 FROM alpine:3.13 as builder
-LABEL maintainer "fredrik.x.olsson@ri.se"
 RUN apk update && \
     apk --no-cache add \
     cmake \
@@ -17,6 +16,7 @@ RUN cmake -Bbuild -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/tmp/cluon
 # Production image
 FROM alpine:3.13
 LABEL maintainer "fredrik.x.olsson@ri.se"
+LABEL org.opencontainers.image.source="https://github.com/RISE-MO/cluon-nmea0183"
 
 RUN apk update && apk add --no-cache \ 
     libstdc++
