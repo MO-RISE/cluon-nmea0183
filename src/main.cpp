@@ -19,6 +19,7 @@
 #include "NMEA0183_assembler.hpp"
 #include "cluon/Envelope.hpp"
 #include "cluon/OD4Session.hpp"
+#include "cluon/TCPConnection.hpp"
 #include "cluon/UDPReceiver.hpp"
 #include "risemo-message-set.hpp"
 #include "spdlog/sinks/daily_file_sink.h"
@@ -53,6 +54,9 @@ auto main(int argc, char **argv) -> int {
   uint16_t port;
   gather->add_option("-p,--port", port, "Port number to connect to")
       ->required();
+  bool is_UDP = false;
+  gather->add_flag("--udp", is_UDP,
+                   "If application should use UDP to connect, default is TCP");
   bool standalone = false;
   gather->add_flag("--standalone", standalone,
                    "If application should be run in standalone mode, i.e. "
@@ -96,18 +100,39 @@ auto main(int argc, char **argv) -> int {
     // And finally use this in a SentenceAssembler
     NMEA0183SentenceAssembler assembler(sentence_handler);
 
-    // Setup a connection to an UDP source with incoming NMEA0183
-    // messages
-    cluon::UDPReceiver connection{
-        address, port,
-        [&assembler](std::string &&d, std::string && /*from*/,
-                     std::chrono::system_clock::time_point &&tp) noexcept {
-          assembler(d, std::move(tp));
-        }};
+    if (is_UDP) {
+      // Setup a connection to an UDP source with incoming NMEA0183
+      // messages
+      cluon::UDPReceiver connection{
+          address, port,
+          [&assembler](std::string &&d, std::string && /*from*/,
+                       std::chrono::system_clock::time_point &&tp) noexcept {
+            std::cout << d << std::endl;
+            assembler(d, std::move(tp));
+          }};
 
-    using namespace std::literals::chrono_literals;  // NOLINT
-    while (connection.isRunning()) {
-      std::this_thread::sleep_for(1s);
+      using namespace std::literals::chrono_literals;  // NOLINT
+      while (connection.isRunning()) {
+        std::this_thread::sleep_for(1s);
+      }
+
+    } else {
+      cluon::TCPConnection connection{
+          address, port,
+          [&assembler](std::string &&d,
+                       std::chrono::system_clock::time_point &&tp) noexcept {
+            assembler(d, std::move(tp));
+          },
+          [&argv]() {
+            std::cerr << "[" << argv[0] << "] Connection lost." << std::endl;
+            exit(1);
+          }};
+
+      // Just sleep as this microservice is data driven.
+      using namespace std::literals::chrono_literals;  // NOLINT
+      while (connection.isRunning()) {
+        std::this_thread::sleep_for(1s);
+      }
     }
   });
 
