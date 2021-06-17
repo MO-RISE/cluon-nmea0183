@@ -2,8 +2,8 @@
 
 Copyright 2021 RISE Research Institute of Sweden - Maritime Operations. Licensed under the Apache License Version 2.0. For details, please contact Fredrik Olsson (fredrik.x.olsson(at)ri.se).
 
-A [libcluon](https://github.com/chrberger/libcluon)-based microservice for eavesdropping on a NMEA0183 stream over (UDP). This software does not perform any parsing of the NMEA sentences, merely assembles any fragmented messages into full sentences. It can be run in two modes:
-* `gather`, connect to an UDP stream of incoming NMEA0183 sentences and either:
+A [libcluon](https://github.com/chrberger/libcluon)-based microservice for eavesdropping on a NMEA0183 stream over either UDP or TCP. This software does not perform any parsing of the NMEA sentences, merely assembles any fragmented messages into full sentences. It can be run in two modes:
+* `gather`, connect to a stream of incoming NMEA0183 sentences and either:
   * publish to an OD4 session, or
   * log directly to disk (`--standalone`)
 * `log`, listen to an OD4 session for raw NMEA0183 messages from other `gatherers`  and dump these to an aggregated log file on disk
@@ -14,7 +14,7 @@ Each release of `cluon-nmea0183` is published as a docker image [here](https://g
 Can also be used as a standalone commandline tool. No pre-built binaries are, however, provided for this purpose.
 
 ## Example docker-compose setup
-The example below showcases a setup with two gatherers (listening on two separate UDP streams) and one logger that aggregates published messages from the gatherers into a single file.
+The example below showcases a setup with two gatherers (listening on two separate stream (one UDP and one TCP)) and one logger that aggregates published messages from the gatherers into a single file.
 ```yaml
 version: '2'
 services:    
@@ -23,13 +23,13 @@ services:
         image: ghcr.io/rise-mo/cluon-nmea0183:v0.1.0
         restart: on-failure
         network_mode: "host"
-        command: "--cid 111 --id 1 gather -a 255.255.255.255 -p 1456"
+        command: "--cid 111 --id 1 gather --udp -a 255.255.255.255 -p 1456"
     gatherer_2:
         container_name: cluon-nmea0183-gatherer-2
         image: ghcr.io/rise-mo/cluon-nmea0183:v0.1.0
         restart: on-failure
         network_mode: "host"
-        command: "--cid 111 --id 2 gather -a 239.192.0.3 -p 60003"
+        command: "--cid 111 --id 2 gather -a 171.31.16.42 -p 6002"
     logger:
         container_name: cluon-nmea0183-logger
         image: ghcr.io/rise-mo/cluon-nmea0183:v0.1.0
