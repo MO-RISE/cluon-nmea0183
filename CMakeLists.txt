@@ -31,9 +31,9 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-  NAME opendlv-standard-message-set
-  GITHUB_REPOSITORY chalmers-revere/opendlv.standard-message-set
-  VERSION 0.9.9
+  NAME risemo-message-set
+  GITHUB_REPOSITORY RISE-MO/risemo-message-set
+  VERSION 0.1.0
   GIT_SHALLOW YES
   DOWNLOAD_ONLY YES
 )
@@ -43,8 +43,7 @@ add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/message_specifications
   DEPENDS cluon
   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/message_specifications
-  COMMAND cluon-msc --cpp --out=${CMAKE_CURRENT_BINARY_DIR}/message_specifications/opendlv-standard-message-set.hpp ${opendlv-standard-message-set_SOURCE_DIR}/opendlv.odvd
-  COMMAND cluon-msc --cpp --out=${CMAKE_CURRENT_BINARY_DIR}/message_specifications/risemo-message-set.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/risemo-message-set.odvd
+  COMMAND cluon-msc --cpp --out=${CMAKE_CURRENT_BINARY_DIR}/message_specifications/risemo-message-set.hpp ${risemo-message-set_SOURCE_DIR}/risemo-message-set.odvd
 )
 add_custom_target(
   generate_message_specifications
