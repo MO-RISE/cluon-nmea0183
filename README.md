@@ -20,24 +20,24 @@ version: '2'
 services:    
     gatherer_1:
         container_name: cluon-nmea0183-gatherer-1
-        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.0
+        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.1
         restart: on-failure
         network_mode: "host"
         command: "--cid 111 --id 1 gather --udp -a 255.255.255.255 -p 1456"
     gatherer_2:
         container_name: cluon-nmea0183-gatherer-2
-        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.0
+        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.1
         restart: on-failure
         network_mode: "host"
         command: "--cid 111 --id 2 gather -a 171.31.16.42 -p 6002"
     logger:
         container_name: cluon-nmea0183-logger
-        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.0
+        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.1
         restart: on-failure
         network_mode: "host"
         volumes:
         - .:/opt/cluon-nmea0183
-        command: "--cid 111 --path /opt/cluon-nmea0183/recordings/record.log log"
+        command: "--cid 111 --path /opt/cluon-nmea0183/recordings/nmea0183.log log"
 ```
 
 ## Details

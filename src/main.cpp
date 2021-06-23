@@ -107,7 +107,6 @@ auto main(int argc, char **argv) -> int {
           address, port,
           [&assembler](std::string &&d, std::string && /*from*/,
                        std::chrono::system_clock::time_point &&tp) noexcept {
-            std::cout << d << std::endl;
             assembler(d, std::move(tp));
           }};
 

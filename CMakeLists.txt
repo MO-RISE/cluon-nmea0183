@@ -33,7 +33,7 @@ CPMAddPackage(
 CPMAddPackage(
   NAME risemo-message-set
   GITHUB_REPOSITORY RISE-MO/risemo-message-set
-  VERSION 0.1.0
+  VERSION 0.2.0
   GIT_SHALLOW YES
   DOWNLOAD_ONLY YES
 )
