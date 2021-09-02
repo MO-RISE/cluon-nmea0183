@@ -9,7 +9,7 @@ A [libcluon](https://github.com/chrberger/libcluon)-based microservice for eaves
 * `log`, listen to an OD4 session for raw NMEA0183 messages from other `gatherers`  and dump these to an aggregated log file on disk
 
 ## How do I get it?
-Each release of `cluon-nmea0183` is published as a docker image [here](https://github.com/orgs/RISE-MO/packages/container/package/cluon-nmea0183) and is publicly available.
+Each release of `cluon-nmea0183` is published as a docker image [here](https://github.com/orgs/MO-RISE/packages/container/package/cluon-nmea0183) and is publicly available.
 
 Can also be used as a standalone commandline tool. No pre-built binaries are, however, provided for this purpose.
 
@@ -20,19 +20,19 @@ version: '2'
 services:    
     gatherer_1:
         container_name: cluon-nmea0183-gatherer-1
-        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.1
+        image: ghcr.io/mo-rise/cluon-nmea0183:v0.3.1
         restart: on-failure
         network_mode: "host"
         command: "--cid 111 --id 1 gather --udp -a 255.255.255.255 -p 1456"
     gatherer_2:
         container_name: cluon-nmea0183-gatherer-2
-        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.1
+        image: ghcr.io/mo-rise/cluon-nmea0183:v0.3.1
         restart: on-failure
         network_mode: "host"
         command: "--cid 111 --id 2 gather -a 171.31.16.42 -p 6002"
     logger:
         container_name: cluon-nmea0183-logger
-        image: ghcr.io/rise-mo/cluon-nmea0183:v0.3.1
+        image: ghcr.io/mo-rise/cluon-nmea0183:v0.3.1
         restart: on-failure
         network_mode: "host"
         volumes:
