@@ -21,7 +21,7 @@
 #include "cluon/OD4Session.hpp"
 #include "cluon/TCPConnection.hpp"
 #include "cluon/UDPReceiver.hpp"
-#include "risemo-message-set.hpp"
+#include "morise-brefv.hpp"
 #include "spdlog/sinks/daily_file_sink.h"
 
 auto main(int argc, char **argv) -> int {
@@ -80,7 +80,7 @@ auto main(int argc, char **argv) -> int {
 
           if (!sink.has_value()) {
             // Publish to OD4 session
-            risemo::raw::NMEA0183 m;
+            morise::raw::NMEA0183 m;
             m.sentence(sentence);
             od4.send(m, timestamp, id);
           } else {
@@ -150,11 +150,11 @@ auto main(int argc, char **argv) -> int {
     // Setup a cluon instance
     cluon::OD4Session od4{cid};
     od4.dataTrigger(
-        risemo::raw::NMEA0183::ID(), [&](cluon::data::Envelope &&envelope) {
+        morise::raw::NMEA0183::ID(), [&](cluon::data::Envelope &&envelope) {
           std::stringstream record;
           record << cluon::time::toMicroseconds(envelope.sampleTimeStamp())
                  << " " << envelope.senderStamp() << " "
-                 << cluon::extractMessage<risemo::raw::NMEA0183>(
+                 << cluon::extractMessage<morise::raw::NMEA0183>(
                         std::move(envelope))
                         .sentence();
           sink->info(record.str());
