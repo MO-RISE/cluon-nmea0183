@@ -2,11 +2,7 @@
 
 Copyright 2021 RISE Research Institute of Sweden - Maritime Operations. Licensed under the Apache License Version 2.0. For details, please contact Fredrik Olsson (fredrik.x.olsson(at)ri.se).
 
-A [libcluon](https://github.com/chrberger/libcluon)-based microservice for eavesdropping on a NMEA0183 stream over either UDP or TCP. This software does not perform any parsing of the NMEA sentences, merely assembles any fragmented messages into full sentences. It can be run in two modes:
-* `gather`, connect to a stream of incoming NMEA0183 sentences and either:
-  * publish to an OD4 session, or
-  * log directly to disk (`--standalone`)
-* `log`, listen to an OD4 session for raw NMEA0183 messages from other `gatherers`  and dump these to an aggregated log file on disk
+A [libcluon](https://github.com/chrberger/libcluon)-based microservice for eavesdropping on a NMEA0183 stream over either UDP or TCP. This software does not perform any parsing or validation of the NMEA0183 sentences, merely acts as a one-way bridge to a libcluon group.
 
 ## How do I get it?
 Each release of `cluon-nmea0183` is published as a docker image [here](https://github.com/orgs/MO-RISE/packages/container/package/cluon-nmea0183) and is publicly available.
@@ -14,36 +10,28 @@ Each release of `cluon-nmea0183` is published as a docker image [here](https://g
 Can also be used as a standalone commandline tool. No pre-built binaries are, however, provided for this purpose.
 
 ## Example docker-compose setup
-The example below showcases a setup with two gatherers (listening on two separate stream (one UDP and one TCP)) and one logger that aggregates published messages from the gatherers into a single file.
+The example below showcases a setup with two listeners (listening on two separate streams (one UDP and one TCP)).
 ```yaml
 version: '2'
 services:    
-    gatherer_1:
-        container_name: cluon-nmea0183-gatherer-1
-        image: ghcr.io/mo-rise/cluon-nmea0183:v0.3.1
+    listener_1:
+        container_name: cluon-nmea0183-listener-1
+        image: ghcr.io/mo-rise/cluon-nmea0183:v0.5.0
         restart: on-failure
         network_mode: "host"
         command: "--cid 111 --id 1 gather --udp -a 255.255.255.255 -p 1456"
-    gatherer_2:
-        container_name: cluon-nmea0183-gatherer-2
-        image: ghcr.io/mo-rise/cluon-nmea0183:v0.3.1
+    listener_2:
+        container_name: cluon-nmea0183-listener-2
+        image: ghcr.io/mo-rise/cluon-nmea0183:v0.5.0
         restart: on-failure
         network_mode: "host"
         command: "--cid 111 --id 2 gather -a 171.31.16.42 -p 6002"
-    logger:
-        container_name: cluon-nmea0183-logger
-        image: ghcr.io/mo-rise/cluon-nmea0183:v0.3.1
-        restart: on-failure
-        network_mode: "host"
-        volumes:
-        - .:/opt/cluon-nmea0183
-        command: "--cid 111 --path /opt/cluon-nmea0183/recordings/nmea0183.log log"
 ```
 
 ## Details
 
 ### Message set
-Makes use of the public message set for maritime applications: https://github.com/MO-RISE/brefv
+Makes use of the public message set for maritime applications: https://github.com/MO-RISE/memo
 
 ### Build from source
 This repository makes use of [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) for dependency resolution as an interal part of the CMake setup. As a result, the only requirements for building from source are:
@@ -53,26 +41,12 @@ This repository makes use of [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake)
 As part of the CMake configuration step, the following dependencies are downloaded and configured:
 * [libcluon](https://github.com/chrberger/libcluon)
 * [CLI11](https://github.com/CLIUtils/CLI11)
-* [spdlog](https://github.com/gabime/spdlog)
-* [doctest](https://github.com/onqtam/doctest) (for testing only)
 
 To build (from the root directory of this repo):
 ```cmd
 cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 cmake --build build -- -j 8
 ```
-
-### Tests
-
-Unit tests for the NMEA01843 sentence assembler is compiled into the executable `cluon-nmea0183-tester`.
-
-To run tests (after successful build):
-```cmd
-cd build
-ctest -C Debug -T test --output-on-failure --
-```
-
-A simple integration test can also be done by running the compiled commandline tool (cluon-nmea0183) in conjunction with the provided python script `fake_nmea_0183_stream_udp.py` in the `tests` folder.
 
 ### Development setup
 This repo contains some configuration files (in the `.vscode`-folder) for getting started easy on the following setup:

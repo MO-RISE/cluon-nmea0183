@@ -24,7 +24,7 @@ ADD . /opt/sources
 WORKDIR /opt/sources
 RUN cmake -Bbuild -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/tmp/cluon-nmea0183-dest && \
     cmake --build build --target install && upx -9 /tmp/cluon-nmea0183-dest/bin/cluon-nmea0183  && \
-    cd build && ctest -T test --output-on-failure
+    cd build
 
 # Production image
 FROM alpine:3.13
