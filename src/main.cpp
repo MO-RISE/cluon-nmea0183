@@ -16,6 +16,7 @@
 #include <optional>
 
 #include "CLI/CLI.hpp"
+#include "assembler.hpp"
 #include "cluon/Envelope.hpp"
 #include "cluon/OD4Session.hpp"
 #include "cluon/TCPConnection.hpp"
@@ -44,6 +45,17 @@ auto main(int argc, char **argv) -> int {
   app.callback([&]() {
     cluon::OD4Session od4{cid};
 
+    Assembler assembler{
+        [&](std::string &&d, std::chrono::system_clock::time_point &&tp) {
+          auto timestamp = cluon::time::convert(tp);
+          memo::raw::NMEA0183 m;
+          m.data(d);
+          od4.send(m, timestamp, id);
+          if (verbose) {
+            std::cout << d << std::endl;
+          }
+        }};
+
     if (is_UDP) {
       // Setup a connection to an UDP source with incoming NMEA0183
       // messages
@@ -51,13 +63,7 @@ auto main(int argc, char **argv) -> int {
           address, port,
           [&](std::string &&d, std::string && /*from*/,
               std::chrono::system_clock::time_point &&tp) noexcept {
-            auto timestamp = cluon::time::convert(tp);
-            memo::raw::NMEA0183 m;
-            m.data(d);
-            od4.send(m, timestamp, id);
-            if (verbose) {
-              std::cout << d << std::endl;
-            }
+            assembler(std::move(d), std::move(tp));
           }};
 
       // Just sleep as this microservice is data driven.
@@ -70,13 +76,7 @@ auto main(int argc, char **argv) -> int {
           address, port,
           [&](std::string &&d,
               std::chrono::system_clock::time_point &&tp) noexcept {
-            auto timestamp = cluon::time::convert(tp);
-            memo::raw::NMEA0183 m;
-            m.data(d);
-            od4.send(m, timestamp, id);
-            if (verbose) {
-              std::cout << d << std::endl;
-            }
+            assembler(std::move(d), std::move(tp));
           },
           [&argv]() {
             std::cerr << "[" << argv[0] << "] Connection lost." << std::endl;
