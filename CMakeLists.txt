@@ -65,5 +65,15 @@ target_link_libraries(${PROJECT_NAME} Threads::Threads cluon-static CLI11)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 add_dependencies(${PROJECT_NAME} generate_message_specifications)
 
+# Tests
+CPMAddPackage("gh:onqtam/doctest#2.4.0")
+
+enable_testing()
+add_executable(${PROJECT_NAME}-tester ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_assembler.cpp)
+target_include_directories(${PROJECT_NAME}-tester PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(${PROJECT_NAME}-tester doctest)
+add_test(NAME ${PROJECT_NAME}-tester COMMAND ${PROJECT_NAME}-tester)
+
+
 # Install executable.
 install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT ${PROJECT_NAME})

@@ -19,13 +19,13 @@ services:
         image: ghcr.io/mo-rise/cluon-nmea0183:v0.5.0
         restart: on-failure
         network_mode: "host"
-        command: "--cid 111 --id 1 gather --udp -a 255.255.255.255 -p 1456"
+        command: "--cid 111 --id 1 --udp -a 255.255.255.255 -p 1456"
     listener_2:
         container_name: cluon-nmea0183-listener-2
         image: ghcr.io/mo-rise/cluon-nmea0183:v0.5.0
         restart: on-failure
         network_mode: "host"
-        command: "--cid 111 --id 2 gather -a 171.31.16.42 -p 6002"
+        command: "--cid 111 --id 2 -a 171.31.16.42 -p 6002"
 ```
 
 ## Details
@@ -41,12 +41,22 @@ This repository makes use of [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake)
 As part of the CMake configuration step, the following dependencies are downloaded and configured:
 * [libcluon](https://github.com/chrberger/libcluon)
 * [CLI11](https://github.com/CLIUtils/CLI11)
+* [doctest](https://github.com/onqtam/doctest) (for testing only)
 
 To build (from the root directory of this repo):
 ```cmd
 cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 cmake --build build -- -j 8
 ```
+
+### Tests
+
+Unit tests for the assembler is compiled into the executable `cluon-nmea0183-tester`.
+
+To run tests (after successful build):
+```cmd
+cd build
+ctest -C Debug -T test --output-on-failure --
 
 ### Development setup
 This repo contains some configuration files (in the `.vscode`-folder) for getting started easy on the following setup:
